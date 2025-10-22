@@ -3,12 +3,14 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
+const path = require('path');
 
 // MongoDB connection
 const connectDB = async () => {
   try {
     if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(process.env.MONGODB_URI);
+      await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://abhinavdharani7_db_user:6SYEl16xmhaeuk71@cluster0.qmqraf1.mongodb.net/web_app');
+      console.log('MongoDB Connected');
     }
   } catch (error) {
     console.error('Database connection error:', error);
@@ -85,6 +87,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 const User = mongoose.model('User', userSchema);
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -94,6 +97,7 @@ app.use(express.urlencoded({ extended: true }));
 // Connect to database
 connectDB();
 
+// API Routes
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -354,6 +358,14 @@ app.get('/api/users/all', async (req, res) => {
   }
 });
 
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, 'frontend/build')));
+
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -363,9 +375,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Frontend: http://localhost:${PORT}`);
+  console.log(`API: http://localhost:${PORT}/api/health`);
 });
-
-module.exports = app;
