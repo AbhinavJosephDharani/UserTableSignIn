@@ -8,8 +8,21 @@ const { body, validationResult } = require('express-validator');
 // MongoDB connection
 const connectDB = async () => {
   try {
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      console.warn('MONGODB_URI is not set — skipping database connection. API endpoints that require the DB will fail until this is provided.');
+      return;
+    }
+
     if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(process.env.MONGODB_URI);
+      // Use a short serverSelectionTimeout so serverless functions fail fast
+      // instead of hanging until the platform timeout (300s).
+      await mongoose.connect(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 5000
+      });
+      console.log('MongoDB Connected');
     }
   } catch (error) {
     console.error('Database connection error:', error);
