@@ -71,6 +71,12 @@ dist
 .cache/
 public
 
+# Allow frontend/public (needed for Vercel static-build). The root
+# `public` entry above is generic; whitelist the frontend public folder
+# so these assets are committed and available during the Vercel build.
+!frontend/public/
+!frontend/public/*
+
 # Storybook build outputs
 .out
 .storybook-out
