@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import './App.css';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://user-table-sign-in-4wi2.vercel.app/api';
+// Prefer an explicit environment variable (REACT_APP_API_URL). If not set,
+// default to the production Vercel deployment domain (so frontend points to
+// the deployed API). When running the frontend on the same origin as the
+// API, you can also set REACT_APP_API_URL to '/api' to use relative paths.
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://user-table-sign-in.vercel.app/api';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
