@@ -10,7 +10,7 @@ import axios from 'axios';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://user-table-sign-in.vercel.app/api';
 
 function App() {
-  const [currentView, setCurrentView] = useState('home');
+  // Removed currentView state as we're using React Router now
   const [user, setUser] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
