@@ -90,9 +90,18 @@ const User = mongoose.model('User', userSchema);
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://user-table-sign-in.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Handle OPTIONS preflight requests
+app.options('*', cors());
 
 // Connect to database
 connectDB();
