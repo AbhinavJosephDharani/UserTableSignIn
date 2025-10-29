@@ -1,3 +1,5 @@
+// Main API file for User Table Sign-In System
+// Handles user authentication, registration, and search functionality
 const express = require('express');
 const serverless = require('serverless-http');
 const cors = require('cors');
