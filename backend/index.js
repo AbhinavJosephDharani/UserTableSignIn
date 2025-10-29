@@ -125,16 +125,17 @@ app.options('*', (req, res) => {
 connectDB();
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'User Table Sign-In API is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing'
   });
 });
 
 // User registration
-app.post('/api/users/register', [
+app.post('/users/register', [
   body('username').isLength({ min: 3, max: 50 }).withMessage('Username must be 3-50 characters'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('firstname').isLength({ min: 1, max: 50 }).withMessage('First name is required'),
@@ -182,7 +183,7 @@ app.post('/api/users/register', [
 });
 
 // User sign-in
-app.post('/api/users/signin', [
+app.post('/users/signin', [
   body('username').notEmpty().withMessage('Username is required'),
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {
@@ -221,7 +222,7 @@ app.post('/api/users/signin', [
 });
 
 // Search users by first and/or last name
-app.get('/api/users/search/name', async (req, res) => {
+app.get('/users/search/name', async (req, res) => {
   try {
     const { firstname, lastname } = req.query;
     
@@ -242,7 +243,7 @@ app.get('/api/users/search/name', async (req, res) => {
 });
 
 // Search users by userid (username)
-app.get('/api/users/search/userid/:username', async (req, res) => {
+app.get('/users/search/userid/:username', async (req, res) => {
   try {
     const { username } = req.params;
     const user = await User.findOne({ username }).select('-password');
@@ -259,7 +260,7 @@ app.get('/api/users/search/userid/:username', async (req, res) => {
 });
 
 // Search users by salary range
-app.get('/api/users/search/salary', async (req, res) => {
+app.get('/users/search/salary', async (req, res) => {
   try {
     const { min, max } = req.query;
     
@@ -279,7 +280,7 @@ app.get('/api/users/search/salary', async (req, res) => {
 });
 
 // Search users by age range
-app.get('/api/users/search/age', async (req, res) => {
+app.get('/users/search/age', async (req, res) => {
   try {
     const { min, max } = req.query;
     
@@ -299,7 +300,7 @@ app.get('/api/users/search/age', async (req, res) => {
 });
 
 // Search users who registered after john registered
-app.get('/api/users/search/after-john', async (req, res) => {
+app.get('/users/search/after-john', async (req, res) => {
   try {
     const john = await User.findOne({ username: 'john' });
     if (!john) {
@@ -318,7 +319,7 @@ app.get('/api/users/search/after-john', async (req, res) => {
 });
 
 // Search users who never signed in
-app.get('/api/users/search/never-signed-in', async (req, res) => {
+app.get('/users/search/never-signed-in', async (req, res) => {
   try {
     const users = await User.find({
       signintime: null
@@ -332,7 +333,7 @@ app.get('/api/users/search/never-signed-in', async (req, res) => {
 });
 
 // Search users who registered on the same day as john
-app.get('/api/users/search/same-day-as-john', async (req, res) => {
+app.get('/users/search/same-day-as-john', async (req, res) => {
   try {
     const john = await User.findOne({ username: 'john' });
     if (!john) {
@@ -356,7 +357,7 @@ app.get('/api/users/search/same-day-as-john', async (req, res) => {
 });
 
 // Search users who registered today
-app.get('/api/users/search/registered-today', async (req, res) => {
+app.get('/users/search/registered-today', async (req, res) => {
   try {
     const today = new Date();
     const startOfDay = new Date(today);
@@ -376,7 +377,7 @@ app.get('/api/users/search/registered-today', async (req, res) => {
 });
 
 // Get all users
-app.get('/api/users/all', async (req, res) => {
+app.get('/users/all', async (req, res) => {
   try {
     const users = await User.find().select('-password');
     res.json({ users, count: users.length });
