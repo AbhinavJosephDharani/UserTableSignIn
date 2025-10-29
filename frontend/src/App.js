@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://user-table-sign-in-4wi2.vercel.app/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://user-table-sign-in-newback.vercel.app';
 
 const Home = () => (
   <div className="home-container">
