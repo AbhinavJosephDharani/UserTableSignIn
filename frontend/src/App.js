@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import './App.css';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://user-table-sign-in-4wi2.vercel.app/api';
+
+const Home = () => (
+  <div className="home-container">
+    <h2>Welcome to the User Management System</h2>
+    <p>This system allows you to:</p>
+    <ul>
+      <li>Register new users</li>
+      <li>Sign in existing users</li>
+      <li>Search users by various criteria</li>
+      <li>View user information securely</li>
+    </ul>
+    <p>Select an option from the navigation menu to get started.</p>
+  </div>
+);
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
@@ -357,47 +372,41 @@ function App() {
   );
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>User Table Sign-In System</h1>
-        <nav>
-          <button onClick={() => setCurrentView('home')}>Home</button>
-          <button onClick={() => setCurrentView('register')}>Register</button>
-          <button onClick={() => setCurrentView('signin')}>Sign In</button>
-          <button onClick={() => setCurrentView('search')}>Search</button>
-          {user && <button onClick={handleSignOut}>Sign Out</button>}
-        </nav>
-        {user && (
-          <div className="user-info">
-            <p>Welcome, {user.firstname} {user.lastname}!</p>
-          </div>
-        )}
-      </header>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <h1>User Table Sign-In System</h1>
+          <nav>
+            <Link to="/" className="nav-button">Home</Link>
+            <Link to="/register" className="nav-button">Register</Link>
+            <Link to="/signin" className="nav-button">Sign In</Link>
+            <Link to="/search" className="nav-button">Search</Link>
+            {user && <button onClick={handleSignOut}>Sign Out</button>}
+          </nav>
+          {user && (
+            <div className="user-info">
+              <p>Welcome, {user.firstname} {user.lastname}!</p>
+            </div>
+          )}
+        </header>
 
-      <main className="App-main">
-        {error && <div className="error-message">{error}</div>}
-        
-        {currentView === 'home' && (
-          <div className="home-container">
-            <h2>Welcome to the User Management System</h2>
-            <p>This system allows you to:</p>
-            <ul>
-              <li>Register new users</li>
-              <li>Sign in existing users</li>
-              <li>Search users by various criteria</li>
-              <li>View user information securely</li>
-            </ul>
-            <p>Select an option from the navigation menu to get started.</p>
-          </div>
-        )}
-
-        {currentView === 'register' && renderRegistrationForm()}
-        {currentView === 'signin' && renderSignInForm()}
-        {currentView === 'search' && renderSearchForms()}
-        
-        {searchResults.length > 0 && renderSearchResults()}
-      </main>
-    </div>
+        <main className="App-main">
+          {error && <div className="error-message">{error}</div>}
+          
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={renderRegistrationForm()} />
+            <Route path="/signin" element={renderSignInForm()} />
+            <Route path="/search" element={
+              <>
+                {renderSearchForms()}
+                {searchResults.length > 0 && renderSearchResults()}
+              </>
+            } />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
