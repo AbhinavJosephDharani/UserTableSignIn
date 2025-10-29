@@ -12,7 +12,7 @@ app.use(express.json());
 
 // --- DB connect ---
 await mongoose.connect(process.env.MONGO_URI);
-console.log("✅ MongoDB connected");
+console.log(" MongoDB connected");
 
 // schema
 
@@ -41,11 +41,11 @@ const sameDayRange = (d) => {
   return { $gte: start, $lt: end };
 };
 
-// ------------------- ROUTES -------------------
+//routes
 
-// Root / health
+// rout
 app.get("/", (req, res) => {
-  res.json({ ok: true, message: "Backend is up 👋" });
+  res.json({ ok: true, message: "Backend is up " });
 });
 
 // (1) Registration
@@ -91,7 +91,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// (3) Search by first and/or last name (prefix LIKE 'X%'), no regex
+// (3) Search by first and/or last name -> using LIKE
 app.get("/users/by-name", async (req, res) => {
   const { first, last } = req.query;
   const q = {};
@@ -154,8 +154,8 @@ app.get("/users/registered-today", async (_req, res) => {
   res.json(users);
 });
 
-// --- Start server ---
+// start
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 backend running on http://localhost:${PORT}`);
+  console.log(` backend running on http://localhost:${PORT}`);
 });

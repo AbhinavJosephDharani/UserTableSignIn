@@ -1,12 +1,4 @@
-MongoDB Queries for User Table Sign-In System
-===============================================
-
-Note: These are MongoDB queries equivalent to the SQL statements required for the project.
-The actual implementation uses Mongoose ODM for better security and validation.
-
-1. CREATE TABLE (Collection Creation)
-=====================================
-// Create Users collection with schema validation
+// 1. CREATE TABLE (Collection Creation)
 db.createCollection("users", {
   validator: {
     $jsonSchema: {
@@ -26,12 +18,11 @@ db.createCollection("users", {
   }
 });
 
-2. USER REGISTRATION
-===================
-// Insert new user (password should be hashed before insertion)
+
+// 2. USER REGISTRATION
 db.users.insertOne({
   username: "john_doe",
-  password: "$2a$10$hashedPassword", // bcrypt hash
+  password: "$2a$10$hashedPassword",
   firstname: "John",
   lastname: "Doe",
   salary: 75000.50,
@@ -40,30 +31,26 @@ db.users.insertOne({
   signintime: null
 });
 
-3. USER SIGN-IN
-==============
-// Find user by username and update signintime
+
+// 3. USER SIGN-IN
 db.users.findOneAndUpdate(
   { username: "john_doe" },
   { $set: { signintime: new Date() } },
   { returnDocument: "after" }
 );
 
-4. SEARCH USERS BY FIRST AND/OR LAST NAME
-=========================================
-// Search by first name only
+
+// 4. SEARCH USERS BY FIRST AND/OR LAST NAME
 db.users.find(
   { firstname: { $regex: "John", $options: "i" } },
   { password: 0 }
 );
 
-// Search by last name only
 db.users.find(
   { lastname: { $regex: "Doe", $options: "i" } },
   { password: 0 }
 );
 
-// Search by both first and last name
 db.users.find(
   {
     firstname: { $regex: "John", $options: "i" },
@@ -72,121 +59,99 @@ db.users.find(
   { password: 0 }
 );
 
-5. SEARCH USERS BY USERID (USERNAME)
-===================================
+
+// 5. SEARCH USERS BY USERID (USERNAME)
 db.users.findOne(
   { username: "john_doe" },
   { password: 0 }
 );
 
-6. SEARCH USERS BY SALARY RANGE
-==============================
+
+// 6. SEARCH USERS BY SALARY RANGE
 db.users.find(
   { salary: { $gte: 50000, $lte: 100000 } },
   { password: 0 }
 );
 
-7. SEARCH USERS BY AGE RANGE
-===========================
+
+// 7. SEARCH USERS BY AGE RANGE
 db.users.find(
   { age: { $gte: 25, $lte: 65 } },
   { password: 0 }
 );
 
-8. SEARCH USERS WHO REGISTERED AFTER JOHN
-========================================
-// First, find John's registration date
+
+// 8. SEARCH USERS WHO REGISTERED AFTER JOHN
 var john = db.users.findOne({ username: "john" });
 var johnRegisterDate = john.registerday;
-
-// Then find users who registered after John
 db.users.find(
   { registerday: { $gt: johnRegisterDate } },
   { password: 0 }
 );
 
-9. SEARCH USERS WHO NEVER SIGNED IN
-==================================
+
+// 9. SEARCH USERS WHO NEVER SIGNED IN
 db.users.find(
   { signintime: null },
   { password: 0 }
 );
 
-10. SEARCH USERS WHO REGISTERED ON SAME DAY AS JOHN
-=================================================
-// First, find John's registration date
+
+// 10. SEARCH USERS WHO REGISTERED ON SAME DAY AS JOHN
 var john = db.users.findOne({ username: "john" });
 var johnRegisterDate = john.registerday;
-
-// Get start and end of that day
 var startOfDay = new Date(johnRegisterDate);
 startOfDay.setHours(0, 0, 0, 0);
 var endOfDay = new Date(johnRegisterDate);
 endOfDay.setHours(23, 59, 59, 999);
-
-// Find users who registered on the same day
 db.users.find(
   { registerday: { $gte: startOfDay, $lte: endOfDay } },
   { password: 0 }
 );
 
-11. SEARCH USERS WHO REGISTERED TODAY
-====================================
-// Get today's date range
+
+// 11. SEARCH USERS WHO REGISTERED TODAY
 var today = new Date();
 var startOfDay = new Date(today);
 startOfDay.setHours(0, 0, 0, 0);
 var endOfDay = new Date(today);
 endOfDay.setHours(23, 59, 59, 999);
-
-// Find users who registered today
 db.users.find(
   { registerday: { $gte: startOfDay, $lte: endOfDay } },
   { password: 0 }
 );
 
-12. GET ALL USERS
-================
+
+// 12. GET ALL USERS
 db.users.find({}, { password: 0 });
 
-13. COUNT USERS
-==============
+
+// 13. COUNT USERS
 db.users.countDocuments();
 
-14. UPDATE USER INFORMATION
-==========================
+
+// 14. UPDATE USER INFORMATION
 db.users.updateOne(
   { username: "john_doe" },
   { $set: { salary: 80000, age: 31 } }
 );
 
-15. DELETE USER
-==============
+
+// 15. DELETE USER
 db.users.deleteOne({ username: "john_doe" });
 
-16. CREATE INDEXES FOR PERFORMANCE
-=================================
-// Index on username for fast lookups
-db.users.createIndex({ username: 1 }, { unique: true });
 
-// Index on firstname and lastname for search
+// 16. CREATE INDEXES FOR PERFORMANCE
+db.users.createIndex({ username: 1 }, { unique: true });
 db.users.createIndex({ firstname: 1 });
 db.users.createIndex({ lastname: 1 });
-
-// Index on salary and age for range queries
 db.users.createIndex({ salary: 1 });
 db.users.createIndex({ age: 1 });
-
-// Index on registerday for date-based queries
 db.users.createIndex({ registerday: 1 });
-
-// Index on signintime for null checks
 db.users.createIndex({ signintime: 1 });
 
-17. AGGREGATION QUERIES
-======================
 
-// Get user statistics
+// 17. AGGREGATION QUERIES
 db.users.aggregate([
   {
     $group: {
@@ -200,7 +165,6 @@ db.users.aggregate([
   }
 ]);
 
-// Get users by registration month
 db.users.aggregate([
   {
     $group: {
@@ -212,7 +176,6 @@ db.users.aggregate([
   { $sort: { _id: 1 } }
 ]);
 
-// Get users who signed in within last 7 days
 db.users.aggregate([
   {
     $match: {
@@ -230,26 +193,7 @@ db.users.aggregate([
           { $subtract: [new Date(), "$signintime"] },
           1000 * 60 * 60 * 24
         ]
-      }
-    }
-  }
+      }
+    }
+  }
 ]);
-
-SECURITY NOTES:
-===============
-1. All passwords should be hashed using bcrypt before storage
-2. Use parameterized queries to prevent NoSQL injection
-3. Implement proper input validation and sanitization
-4. Use HTTPS for all API communications
-5. Implement rate limiting for authentication endpoints
-6. Use environment variables for sensitive configuration
-7. Implement proper error handling without exposing sensitive information
-
-IMPLEMENTATION NOTES:
-====================
-- The actual implementation uses Mongoose ODM for better security
-- All queries are parameterized to prevent injection attacks
-- Input validation is performed using express-validator
-- Password hashing is done using bcryptjs
-- CORS is properly configured for cross-origin requests
-- Error handling is comprehensive and user-friendly
