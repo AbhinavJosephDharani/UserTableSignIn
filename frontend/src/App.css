@@ -25,7 +25,7 @@ nav {
   flex-wrap: wrap;
 }
 
-nav button {
+nav .nav-button {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
@@ -34,9 +34,10 @@ nav button {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
+  text-decoration: none;
 }
 
-nav button:hover {
+nav .nav-button:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
