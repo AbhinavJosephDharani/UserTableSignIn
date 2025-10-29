@@ -197,3 +197,67 @@ db.users.aggregate([
     }
   }
 ]);
+
+
+
+curl -X POST http://localhost:5000/register ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"alex1\",\"password\":\"pass123\",\"firstname\":\"Alex\",\"lastname\":\"Johnson\",\"salary\":72000,\"age\":35}"
+
+
+
+
+curl -X POST http://localhost:5000/register ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"priya1\",\"password\":\"123abc\",\"firstname\":\"Priya\",\"lastname\":\"Patel\",\"salary\":88000,\"age\":29}"
+
+
+curl -X POST http://localhost:5000/register ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"alex1\",\"password\":\"pass123\",\"firstname\":\"Alex\",\"lastname\":\"Johnson\",\"salary\":72000,\"age\":35}"
+
+
+curl -X POST http://localhost:5000/register ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"omar1\",\"password\":\"xyz789\",\"firstname\":\"Omar\",\"lastname\":\"Gebara\",\"salary\":110000,\"age\":40}"
+
+
+
+
+db.users.find(
+  { lastname: { $regex: "abi", $options: "i" } },
+  { password: 0 }
+);
+
+
+db.createCollection("users", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["username", "password", "firstname", "lastname", "salary", "age"],
+      properties: {
+        username: { bsonType: "string", maxLength: 50 },
+        password: { bsonType: "string", maxLength: 100 },
+        firstname: { bsonType: "string", maxLength: 50 },
+        lastname: { bsonType: "string", maxLength: 50 },
+        salary: { bsonType: "number", minimum: 0 },
+        age: { bsonType: "int", minimum: 0, maximum: 150 },
+        registerday: { bsonType: "date" },
+        signintime: { bsonType: ["date", "null"] }
+      }
+    }
+  }
+});
+
+
+// Insert new user (password should be hashed before insertion)
+db.users.insertOne({
+  username: "john_doe",
+  password: "$2a$10$hashedPassword", // bcrypt hash
+  firstname: "John",
+  lastname: "Doe",
+  salary: 75000.50,
+  age: 30,
+  registerday: new Date(),
+  signintime: null
+});
