@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import axios from 'axios';
 
@@ -20,7 +20,6 @@ const Home = () => (
 );
 
 function App() {
-  const [currentView, setCurrentView] = useState('home');
   const [user, setUser] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
