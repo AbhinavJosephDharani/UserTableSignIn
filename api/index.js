@@ -10,11 +10,21 @@ const { body, validationResult } = require('express-validator');
 // MongoDB connection
 const connectDB = async () => {
   try {
+    console.log('Attempting to connect to MongoDB...');
+    console.log('MongoDB URI:', process.env.MONGODB_URI ? 'URI exists' : 'URI is missing');
+    
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect(process.env.MONGODB_URI);
+      console.log('MongoDB Connected Successfully');
+      console.log('Connection State:', mongoose.connection.readyState);
+      console.log('Connected to database:', mongoose.connection.name);
+    } else {
+      console.log('Already connected to MongoDB');
+      console.log('Current Connection State:', mongoose.connection.readyState);
     }
   } catch (error) {
     console.error('Database connection error:', error);
+    throw error; // Rethrow to handle it in the calling function
   }
 };
 
@@ -101,7 +111,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Handle OPTIONS preflight requests
-app.options('*', cors());
+app.options('*', (req, res) => {
+  console.log('OPTIONS request received for path:', req.path);
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
+  }).status(200).send();
+});
 
 // Connect to database
 connectDB();
@@ -124,6 +142,8 @@ app.post('/api/users/register', [
   body('salary').isNumeric().withMessage('Salary must be a number'),
   body('age').isInt({ min: 0, max: 150 }).withMessage('Age must be between 0 and 150')
 ], async (req, res) => {
+  console.log('Registration endpoint hit');
+  console.log('Request body:', { ...req.body, password: '[REDACTED]' });
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
